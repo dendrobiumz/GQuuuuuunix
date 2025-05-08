@@ -15,7 +15,7 @@ void init_timer()
 {
     u64 hart_id = r_mhartid();
 
-    int interval = 1000000;
+    int interval = 10000;
     *(u64*) CLINT_MTIMECMP(hart_id) = *(u64*) CLINT_MTIME + interval;
 
     u64 *per_hart_scratch = &timer_scratch[hart_id][0];
