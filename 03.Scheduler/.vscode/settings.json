@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "atomic_ops.h": "c",
+        "spin_lock.h": "c"
+    }
+}
