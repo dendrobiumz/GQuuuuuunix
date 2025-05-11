@@ -136,7 +136,7 @@ static int test_set_u8(volatile u8 *ptr)
     return ret;
 }
 
-int __test_set(void *ptr, u64 sz)
+int __test_set(void *ptr, i64 sz)
 {
     int ret;
     switch(sz) {

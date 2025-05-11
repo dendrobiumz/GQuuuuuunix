@@ -16,7 +16,7 @@ int __cmpxchg(void *ptr, u64 expected, u64 desired, i64 sz);
     __cmpxchg(ptr, old, new, sizeof(*(ptr))); \
 })
 
-int __test_set(void *ptr);
+int __test_set(void *ptr, i64 sz);
 
 #define TEST_SET(ptr) ({ \
     __test_set(ptr, sizeof(*(ptr))); \
