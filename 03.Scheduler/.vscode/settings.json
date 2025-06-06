@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "atomic_ops.h": "c",
-        "spin_lock.h": "c"
+        "spin_lock.h": "c",
+        "functional": "c",
+        "cmath": "c",
+        "param.h": "c",
+        "semaphore": "c",
+        "stop_token": "c",
+        "memory": "c",
+        "types.h": "c"
     }
 }
