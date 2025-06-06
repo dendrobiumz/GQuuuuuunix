@@ -1,12 +1,12 @@
-#ifndef  _SPIN_LOCK_H
-#define  _SPIN_LOCK_H
+#ifndef  SPIN_LOCK_H
+#define  SPIN_LOCK_H
 
 #include "types.h"
 
 struct cpu;
 
-typedef struct spin_lock {
-    u32 isLocked;
+typedef struct __attribute__ ((aligned (8))) spin_lock {
+    atomic_int_t isLocked;
     struct cpu *cpu;
     void (*acquire)(struct spin_lock *lk);
     void (*release)(struct spin_lock *lk);
