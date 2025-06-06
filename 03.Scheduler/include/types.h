@@ -17,6 +17,19 @@ typedef long              i64;
 typedef u64               paddr_t;
 typedef u64               vaddr_t;
 
+typedef struct __attribute__ ((aligned (4))) atomic_int {
+    volatile int val;
+} atomic_int_t;
+
+
+typedef struct __attribute__ ((aligned (8))) atomic_long {
+    volatile long val;
+} atomic_long_t;
+
+typedef struct __attribute__ ((aligned (8))) atomic_ulong {
+    volatile unsigned long val;
+} atomic_ulong_t;
+
 
 #define NULL              ((void*)(0x0))
 #define true              (1)
