@@ -1,6 +1,8 @@
 #include "string.h"
 #include "console.h"
+#include "mem_layout.h"
 
+extern char end[];
 
 static void memcpy_1(u8* dst, const u8 *src, i64 n)
 {
@@ -69,4 +71,35 @@ i64 strlen(const char* str)
     while (*str++ != '\0')
         ++len;
     return len;
+}
+
+void* memset(void *str, int c, i64 n)
+{
+    u64 addr = (u64) str, *str_64 = str;
+    u8 *str_8 = str;
+    if (addr < (u64) end || addr > PA_STOP)
+        PANIC("memset: invalid str\n");
+
+    i64 len = n;
+
+    if (addr & 0x7) {
+        while (len--)
+            *str_8++ = ((u64)(u8) c);
+        return str;
+    }
+    
+    i64 eight_bytes_cnt = len / 8;
+    len %= 8;
+    u64 mask = 0;
+
+    for (int i = 0; i < 8; i++)
+        mask |= ((u64)(u8) c) << (8 * i);
+    
+    while (eight_bytes_cnt--)
+        *str_64++ = mask;
+    
+    str_8 = (u8*) str_64;
+    while (len--)
+        *str_8++ = (u8) c;
+    return str;
 }
