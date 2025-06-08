@@ -119,11 +119,11 @@ static inline unsigned long __cmp_xchg_u64(volatile atomic_ulong_t* a_ulong,
     return old;
 }
 
-#define CMP_XCHG(ATMOIC_PTR, EXPECTED, DESIRED) \
+#define CMP_XCHG(ATOMIC_PTR, EXPECTED, DESIRED) \
 ({ \
-    __auto_type __p = (ATMOIC_PTR); \
-    __typeof__((void)0, *__p) __e = (EXPECTED); \
-    __typeof__((void)0, *__p) __d = (DESIRED);  \
+    __auto_type __p = (ATOMIC_PTR); \
+    __typeof__((void)0, (__p->val)) __e = (EXPECTED); \
+    __typeof__((void)0, (__p->val)) __d = (DESIRED);  \
     _Generic(*__p,                      \
         atomic_int_t: __cmp_xchg_i32,   \
         atomic_long_t: __cmp_xchg_i64,  \
@@ -245,7 +245,7 @@ static inline int __atomic_fetch_add_i32(volatile atomic_int_t* a_int, int val)
 {
     int old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic add\n"
         "amoadd.w.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_int->val)
@@ -259,7 +259,7 @@ static inline long __atomic_fetch_add_i64(volatile atomic_long_t* a_long, long v
 {
     long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic add\n"
         "amoadd.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_long->val)
@@ -273,7 +273,7 @@ static inline unsigned long __atomic_fetch_add_u64(volatile atomic_ulong_t* a_ul
 {
     unsigned long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic add\n"
         "amoadd.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_ulong->val)
@@ -283,7 +283,7 @@ static inline unsigned long __atomic_fetch_add_u64(volatile atomic_ulong_t* a_ul
     return old;
 }
 
-#define ATOMIC_FETCH_ADD(ATMOIC_PTR, VAL) \
+#define ATOMIC_FETCH_ADD(ATOMIC_PTR, VAL) \
 ({ \
     __auto_type __p = (ATOMIC_PTR); \
     __auto_type __val = (VAL); \
@@ -299,7 +299,7 @@ static inline int __atomic_fetch_sub_i32(volatile atomic_int_t* a_int, int val)
 {
     int old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic sub\n"
         "amoadd.w.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_int->val)
@@ -313,7 +313,7 @@ static inline long __atomic_fetch_sub_i64(volatile atomic_long_t* a_long, long v
 {
     long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic sub\n"
         "amoadd.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_long->val)
@@ -327,7 +327,7 @@ static inline unsigned long __atomic_fetch_sub_u64(volatile atomic_ulong_t* a_ul
 {
     unsigned long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic sub\n"
         "amoadd.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_ulong->val)
@@ -337,7 +337,7 @@ static inline unsigned long __atomic_fetch_sub_u64(volatile atomic_ulong_t* a_ul
     return old;
 }
 
-#define ATOMIC_FETCH_SUB(ATMOIC_PTR, VAL) \
+#define ATOMIC_FETCH_SUB(ATOMIC_PTR, VAL) \
 ({ \
     __auto_type __p = (ATOMIC_PTR); \
     __auto_type __val = (VAL); \
@@ -353,7 +353,7 @@ static inline int __atomic_fetch_and_i32(volatile atomic_int_t* a_int, int val)
 {
     int old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic add\n"
         "amoand.w.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_int->val)
@@ -367,7 +367,7 @@ static inline long __atomic_fetch_and_i64(volatile atomic_long_t* a_long, long v
 {
     long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic add\n"
         "amoand.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_long->val)
@@ -381,7 +381,7 @@ static inline unsigned long __atomic_fetch_and_u64(volatile atomic_ulong_t* a_ul
 {
     unsigned long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic add\n"
         "amoand.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_ulong->val)
@@ -391,7 +391,7 @@ static inline unsigned long __atomic_fetch_and_u64(volatile atomic_ulong_t* a_ul
     return old;
 }
 
-#define ATOMIC_FETCH_AND(ATMOIC_PTR, VAL) \
+#define ATOMIC_FETCH_AND(ATOMIC_PTR, VAL) \
 ({ \
     __auto_type __p = (ATOMIC_PTR); \
     __auto_type __val = (VAL); \
@@ -407,7 +407,7 @@ static inline int __atomic_fetch_or_i32(volatile atomic_int_t* a_int, int val)
 {
     int old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic or\n"
         "amoor.w.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_int->val)
@@ -421,7 +421,7 @@ static inline long __atomic_fetch_or_i64(volatile atomic_long_t* a_long, long va
 {
     long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic or\n"
         "amoor.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_long->val)
@@ -435,7 +435,7 @@ static inline unsigned long __atomic_fetch_or_u64(volatile atomic_ulong_t* a_ulo
 {
     unsigned long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic or\n"
         "amoor.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_ulong->val)
@@ -445,7 +445,7 @@ static inline unsigned long __atomic_fetch_or_u64(volatile atomic_ulong_t* a_ulo
     return old;
 }
 
-#define ATOMIC_FETCH_OR(ATMOIC_PTR, VAL) \
+#define ATOMIC_FETCH_OR(ATOMIC_PTR, VAL) \
 ({ \
     __auto_type __p = (ATOMIC_PTR); \
     __auto_type __val = (VAL); \
@@ -462,7 +462,7 @@ static inline int __atomic_fetch_xor_i32(volatile atomic_int_t* a_int, int val)
     int old;
     volatile int *ptr = &a_int->val;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic xor\n"
         "amoxor.w.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(ptr)
@@ -476,7 +476,7 @@ static inline long __atomic_fetch_xor_i64(volatile atomic_long_t* a_long, long v
 {
     long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic xor\n"
         "amoxor.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_long->val)
@@ -490,7 +490,7 @@ static inline unsigned long __atomic_fetch_xor_u64(volatile atomic_ulong_t* a_ul
 {
     unsigned long old;
     push_off();
-    asm volatile (
+    asm volatile ("#atomic xor\n"
         "amoxor.d.aqrl %0, %1, (%2)"
         : "=r"(old)
         : "r"(val), "r"(&a_ulong->val)
@@ -500,7 +500,7 @@ static inline unsigned long __atomic_fetch_xor_u64(volatile atomic_ulong_t* a_ul
     return old;
 }
 
-#define ATOMIC_FETCH_XOR(ATMOIC_PTR, VAL) \
+#define ATOMIC_FETCH_XOR(ATOMIC_PTR, VAL) \
 ({ \
     __auto_type __p = (ATOMIC_PTR); \
     __auto_type __val = (VAL); \
