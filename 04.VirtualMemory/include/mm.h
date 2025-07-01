@@ -1,8 +1,21 @@
 #ifndef MM_H
 #define MM_H
 
+#include "list.h"
+
+struct per_cpu_pages {
+    int count;
+    struct list_head head;
+};
+
 void* kalloc();
 
-int kfree(void *addr);
+void kfree(void *addr);
+
+void* page_alloc(int n);
+
+void page_free(void *addr, int n);
+
+void kinit_pa();
 
 #endif
