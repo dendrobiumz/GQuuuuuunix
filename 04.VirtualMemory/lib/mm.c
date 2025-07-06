@@ -14,10 +14,10 @@ struct {
 } g_kmem;
 
 
-// void *kalloc()
-// {
-//     return page_alloc(1);
-// }
+void *_kalloc()
+{
+    return page_alloc(1);
+}
 
 // void kfree_range(void *start, int n)
 // {
@@ -64,37 +64,32 @@ void kfree(void *pa)
 void
 freerange(void *pa_start, void *pa_end)
 {
-  char *p;
-  p = (char*) PGROUNDUP((u64)pa_start);
-  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
+    char *p;
+    p = (char*) PGROUNDUP((u64)pa_start);
+    for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
     kfree(p);
 }
 
-// void _kfree(void *addr, int n)
-// {
-//     u64 pa = (u64) addr;
-//     struct list_head *node;
-//     if ((pa % PG_SZ) != 0 || (char*)pa < end || pa >= PA_STOP)
-//         PANIC("kfree");
-    
-//     if (n == 1) {
-//         memset(addr, 6, PG_SZ);
-//         node = (struct list_head*) pa;
-
-//         g_kmem.lk.acquire(&g_kmem.lk);
-//         list_add(node, &g_kmem.head);
-//         g_kmem.lk.release(&g_kmem.lk);
-//     } else {
-//         page_free(addr, n);
-//     }
-// }
-
-void kinit_pa()
+void _kfree(void *addr, int n)
 {
-    init_spin_lock(&g_kmem.lk);
-    INIT_LIST_HEAD(&g_kmem.head);
-    freerange(end, (void*) PA_STOP);   // CHECK HERE -> ERROR
+    u64 pa = (u64) addr;
+    struct list_head *node;
+    if ((pa % PG_SZ) != 0 || (char*)pa < end || pa >= PA_STOP)
+        PANIC("kfree");
+    
+    if (n == 1) {
+        memset(addr, 6, PG_SZ);
+        node = (struct list_head*) pa;
+
+        g_kmem.lk.acquire(&g_kmem.lk);
+        list_add(node, &g_kmem.head);
+        g_kmem.lk.release(&g_kmem.lk);
+    } else {
+        page_free(addr, n);
+    }
 }
+
+
 
 static void* link_pages_internal(void *addr, int n)
 {
@@ -200,4 +195,21 @@ void page_free(void *addr, int n)
     ((struct list_head*) addr)->prev = first;
 out:
     g_kmem.lk.release(&g_kmem.lk);
+}
+
+
+void _freerange(void *pa_start, void *pa_end)
+{
+    char *p;
+    p = (char*) PGROUNDUP((u64)pa_start);
+    for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
+        _kfree(p, 1);
+}
+
+
+void kinit_pa()
+{
+    init_spin_lock(&g_kmem.lk);
+    INIT_LIST_HEAD(&g_kmem.head);
+    _freerange(end, (void*) PA_STOP);   // CHECK HERE -> ERROR
 }
