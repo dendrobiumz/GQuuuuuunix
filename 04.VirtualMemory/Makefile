@@ -16,7 +16,7 @@ GDB = riscv64-unknown-elf-gdb
 
 all: kernel.elf
 
-kernel.elf: lib/string.c lib/task.c lib/switch.s lib/spin_lock.c lib/sched.c entry.s lib/console.c lib/trap.c lib/kvec.s start.c  main.c
+kernel.elf: lib/mm.c lib/string.c lib/task.c lib/switch.s lib/spin_lock.c lib/sched.c entry.s lib/console.c lib/trap.c lib/kvec.s start.c  main.c
 	$(CC) $(CFLAGS) -T kernel.ld -o kernel.elf $^
 
 
