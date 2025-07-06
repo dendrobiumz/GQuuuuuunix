@@ -73,10 +73,18 @@ i64 strlen(const char* str)
     return len;
 }
 
+/**
+ *  memset
+ *  @str: address begin to set
+ *  @c: val to be set each byte
+ *  @n: byte numbers
+ */
+
 void* memset(void *str, int c, i64 n)
 {
     u64 addr = (u64) str, *str_64 = str;
     u8 *str_8 = str;
+    int i;
     if (addr < (u64) end || addr > PA_STOP)
         PANIC("memset: invalid str\n");
 
@@ -92,10 +100,10 @@ void* memset(void *str, int c, i64 n)
     len %= 8;
     u64 mask = 0;
 
-    for (int i = 0; i < 8; i++)
+    for (i = 0; i < 8; i++)
         mask |= ((u64)(u8) c) << (8 * i);
     
-    while (eight_bytes_cnt--)
+    while (eight_bytes_cnt-- && (u64)str_64 <= PA_STOP)
         *str_64++ = mask;
     
     str_8 = (u8*) str_64;
