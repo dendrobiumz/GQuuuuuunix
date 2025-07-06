@@ -35,4 +35,6 @@ SECTIONS
     . = ALIGN(16);
     *(.sbss .sbss.*) *(.bss .bss.*)
   } >data
+  
+  PROVIDE(end = .);
 }
