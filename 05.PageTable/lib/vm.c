@@ -21,16 +21,17 @@ void kvmmap()
 
 pte_t* walk_pgtbl(pagetable_t pgtbl, u64 va, int alloc)
 {
-    int level = 0, offset = 12, mask = (1 - (1 << 10));
+    int level = 0, offset = 30, mask = (1 - (1 << 10));
     pte_t *pte = 0;
     pagetable_t _pgtbl = pgtbl;
 
     // walking 3 levels
-    for (int i = 0; i < 3; i++) {
+    // start from level 2
+    for (int i = 0; i < 2; i++) {
         level = (va & (mask << offset)) >> offset;
         pte = &_pgtbl[level];
         if (*pte & PTE_V) {
-            _pgtbl = ((*pte) >> 10) << 12; // page-aligned 
+            _pgtbl = ((*pte) >> 10) << 12; // 12: page size(4096 bytes) aligned 
         } else {
             if (alloc && (_pgtbl = _kalloc()) == 0)
                 return NULL;
@@ -38,9 +39,9 @@ pte_t* walk_pgtbl(pagetable_t pgtbl, u64 va, int alloc)
             *pte = (((u64)_pgtbl >> 12) << 10) | PTE_V;
         }
 
-        offset += 9;
+        offset -= 9;
     }
-    return pte;
+    return &_pgtbl[(va & (mask << offset)) >> offset];
 }
 
 int map_pages(pagetable_t pgtbl, u64 va, i64 pg_nrs, u64 pa, int flag)
@@ -59,6 +60,15 @@ int map_pages(pagetable_t pgtbl, u64 va, i64 pg_nrs, u64 pa, int flag)
 
     while (true) {
         pte = walk_pgtbl(pgtbl, va, 1);
+
+        if (*pte & PTE_V)
+            PANIC("[MAPPAGES] ALREADY MAPPED");
+        *pte = ((pa >> 12) << 10) | flag | PTE_V;
+        if (cur == last_page)
+            break;
+        cur += PG_SZ;
+        pa += PG_SZ;
     }
+    return 0;
 }
 
