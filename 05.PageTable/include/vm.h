@@ -5,6 +5,6 @@
 
 
 void init_kpgtabl();
-
+void kvminithart();
 
 #endif
