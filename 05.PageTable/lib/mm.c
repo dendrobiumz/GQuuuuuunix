@@ -61,14 +61,6 @@ void kfree(void *pa)
     g_kmem.lk.release(&g_kmem.lk);
 }
 
-void
-freerange(void *pa_start, void *pa_end)
-{
-    char *p;
-    p = (char*) PGROUNDUP((u64)pa_start);
-    for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
-    kfree(p);
-}
 
 void _kfree(void *addr, int n)
 {
@@ -206,6 +198,14 @@ void _freerange(void *pa_start, void *pa_end)
         _kfree(p, 1);
 }
 
+void
+freerange(void *pa_start, void *pa_end)
+{
+    char *p;
+    p = (char*) PGROUNDUP((u64)pa_start);
+    for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
+        kfree(p);
+}
 
 void kinit_pa()
 {
