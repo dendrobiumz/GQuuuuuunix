@@ -85,8 +85,6 @@ void* memset(void *str, int c, i64 n)
     u64 addr = (u64) str, *str_64 = str;
     u8 *str_8 = str;
     int i;
-    if (addr < (u64) end || addr > PA_STOP)
-        PANIC("memset: invalid str\n");
 
     i64 len = n;
 
