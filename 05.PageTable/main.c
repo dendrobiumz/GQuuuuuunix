@@ -6,6 +6,7 @@
 #include "task.h"
 #include "atomic.h"
 #include "mm.h"
+#include "vm.h"
 
 fixed_point_t time;
 
@@ -24,6 +25,10 @@ void kernel_main(void)
     w_stvec((u64)kernelvec);
     if (cpu_id == 0) {
         kinit_pa();
+        printf("[init] kernel page table\n");
+        init_kpgtabl();
+        kvminithart();
+
         printf("GQuuuuuunix Kernel Booting ... \n\n");
         time.data = 0x0;
         time.mantissa_bit = 32;
